@@ -284,6 +284,7 @@ namespace {
                                   ezTheme.kb, FSS9);
     helpW.on(E_TOUCH, doFunction { ezQuit(); });
     helpW.run();
+    ez.draw();
   }
 
 }
@@ -354,9 +355,10 @@ String keyboardInput(String prompt_ /* = "" */, String text_ /* = "" */) {
   ez.delHandlers(keyHandler);
   kb->window.blur();
   String r = kb->text;
-  delete kb;
 
   ez.draw();
+
+  delete kb;
 
   return r;
 }

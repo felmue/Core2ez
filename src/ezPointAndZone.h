@@ -88,33 +88,99 @@
 #define HIGHEST_X 319         // Can't trust TFT_WIDTH, driver is portrait
 #define HIGHEST_Y 239
 
-
 class ezZone;
 
+
+/// Stores a point on the screen.
+/**
+  Holds the coordinates of a point on the screen. Has methods to do various
+  determinations and calculations.
+*/
 class ezPoint {
  public:
+  /**
+    As you declare a point, you can provide x and y coordinates. If you don't
+    specify, the point will be invalid. ( Which means both its `x` and `y`
+    coordinates are set to the special value `EZ_INVALID`. )
+  */
   ezPoint(int16_t x_ = EZ_INVALID, int16_t y_ = EZ_INVALID);
+
+  /**
+    `True` if this point has same coordinates as point `p`
+  */
+  bool Equals(const ezPoint& p);
+
   bool operator==(const ezPoint& p);
+  /**
+    `operator==` and `operator!=` cause `if (a == b) ...` and `if (a != b) ...`
+    to compare coordinates instead of checking whether the variables point to
+    the same object instance. Shortcut for `if (a.Equals(b)) ...` and
+    `if (!a.Equals(b)) ...`
+  */
   bool operator!=(const ezPoint& p);
+
+
   ezPoint operator+(const ezPoint &p);
   ezPoint operator-(const ezPoint &p);
   ezPoint& operator+=(const ezPoint& p);
+  /**
+    `operator+`, `operator-`, `operator+=` and `operator-=` are there so you
+    can add and subtract ezPoints to do vector calculations. Simply adds or
+    subtracts the coordinates for each axis.
+  */
   ezPoint& operator-=(const ezPoint& p);
+
+  bool valid();         ///< `True` if this point is valid.
+
+  /**
+    Allows you to say `if (somePoint) ...` to test if a point is valid.
+    Equivalent to `if (somePoint.valid() ...`
+  */
   explicit operator bool();
+
+  /**
+    returns a character representation of the point, such as `( 10, 200)` or
+    `(invalid )`. Note that the coordinates are left-padded with spaces such
+    that the returned string is always 10 characters in size.
+  */
   operator char*();
+
+  /**
+    Allows you to change the coordinates of an existing point. `.set()` will
+    mark the point as invalid.
+  */
   void set(int16_t x_ = EZ_INVALID, int16_t y_ = EZ_INVALID);
-  bool valid();
-  bool in(ezZone& z);
-  bool Equals(const ezPoint& p);
+
+  bool in(ezZone& z);   ///< `True` if this point lies inside ezZone `z`.
+  /**
+    Returns the distance from here to point `p`, in whole pixels using
+    pythagoras.
+    \param p the point towards which we are calculating distance
+  */
   uint16_t distanceTo(const ezPoint& p);
+  /**
+    Returns the compass direction from here to point `p`, in whole degrees.
+    \param p the point towards which we are calculating direction
+  */
   uint16_t directionTo(const ezPoint& p);
+  /**
+    `True` if the compass direction from here to point `p` equals `wanted`,
+    plus or minus `plusminus`.
+    \param p the point towards which we are calculating direction
+    \param wanted the compass direction to test for in whole degrees
+    \param plusminus how much deviation the test still accepts. \
+           Defaults to 45 degrees.
+  */
   bool isDirectionTo(const ezPoint& p, int16_t wanted,
                      uint8_t plusminus = PLUSMINUS);
+  /**
+    Rewrites the coordinates to the screen rotation indicated.
+    \param m Screen rotation (0-7)
+  */
   void rotate(uint8_t m);
-  int16_t x, y;
 
- private:
-  char _text[12];
+  int16_t x;      ///< x-coordinate of point, or EZ_INVALID
+  int16_t y;      ///< y-coordinate of point, or EZ_INVALID
 };
 
 class ezZone {
